@@ -2,7 +2,10 @@ from flask import Flask, render_template, Response
 import cv2
 
 app = Flask(__name__)
-camera = cv2.VideoCapture(0)
+# If you want to use the camera on the laptop
+# camera = cv2.VideoCapture(0)
+# If you want to use the usb camera
+camera = cv2.VideoCapture(1)
 
 def gen_frames():
     while True:
