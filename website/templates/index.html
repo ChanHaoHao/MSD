@@ -1,12 +1,23 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <title>Flask</title>
-</head>
-<body>
-  <h3>Camera Live Streaming</h3>
-  <img src="{{ url_for('video_feed') }}">
-  <h3>Complementary Color</h3>
-  <img src="{{ url_for('complement_feed') }}">
-</body>
+<html>
+  <head>
+    <title>MSD Streaming</title>
+    <meta name="viewport" content="with=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+  </head>
+
+  <body>
+  <section class="streaming">
+    <div class="row">
+      <div class="streaming-col">
+        <h3>Camera Live Streaming</h3>
+        <img src="{{ url_for('video_feed') }}">
+      </div>
+      <div class="streaming-col">
+        <h3>Complementary Color Live Streaming</h3>
+        <img src="{{ url_for('complement_feed') }}">
+      </div>
+    </div>
+  </section>
+  </body>
 </html>
