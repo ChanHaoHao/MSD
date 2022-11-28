@@ -1,5 +1,7 @@
 from flask import Flask, render_template, Response
 import cv2
+# import numpy as np
+# import time
 
 app = Flask(__name__)
 # If you want to use the camera on the laptop
@@ -22,6 +24,10 @@ def complementary_color():
     while True:
         success, image = camera.read()
         image = 255-image
+        # in_data = np.asarray(image)
+        # lo = np.amin(in_data, axis=2, keepdims=True)
+        # hi = np.amin(in_data, axis=2, keepdims=True)
+        # out_data = (lo+hi)-in_data
         ret, buffer = cv2.imencode('.jpg', image)
         image = buffer.tobytes()
         yield (b'--frame\r\n'
