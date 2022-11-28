@@ -1,6 +1,12 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <Servo.h>
+#include "DHT.h"
+
+// DHT setting
+#define DHTTYPE DHT11   // DHT 11
+#define DHTPin 2      // the pin for DHT11 data D4
+DHT dht(DHTPin, DHTTYPE); 
 
 // WiFi settings
 #define SSID_AP            "ESP8266_WiFi_Car" // AP server name
@@ -25,6 +31,8 @@ Servo servo;
 int car_mode = 0;                             // set car drive mode (0 = stop)
 int pos;
 int current_pos = 0;
+float Temperature;
+float Humidity;
 
 // initialize
 void setup() {
@@ -41,6 +49,9 @@ void setup() {
   delay(2);
   servo.detach();
   car_control(); // stop the car
+
+  pinMode(DHTPin, INPUT);
+  dht.begin();
 
   WiFi.mode(WIFI_AP);
   WiFi.softAPConfig(local_ip, gateway, subnet);
@@ -132,6 +143,12 @@ void handle_arm_down() {
   server.send(200, "text/html", SendHTML());
 }
 
+void handle_DHT11() {
+  Temperature = dht.readTemperature(); // Gets the values of the temperature
+  Humidity = dht.readHumidity(); // Gets the values of the humidity 
+  server.send(200, "text/html", SendHTML());
+}
+
 // control car movement
 void car_control() {
   switch (car_mode) {
@@ -154,15 +171,15 @@ void car_control() {
       analogWrite(LEFT_MOTOR_PIN2, LEFT_MOTOR_SPEED);
       break;
     case 3: // turn left
-      analogWrite(RIGHT_MOTOR_PIN1, RIGHT_MOTOR_SPEED);
+      analogWrite(RIGHT_MOTOR_PIN1, RIGHT_MOTOR_SPEED/3);
       digitalWrite(RIGHT_MOTOR_PIN2, LOW);
       digitalWrite(LEFT_MOTOR_PIN1, LOW);
-      analogWrite(LEFT_MOTOR_PIN2, LEFT_MOTOR_SPEED);
+      analogWrite(LEFT_MOTOR_PIN2, LEFT_MOTOR_SPEED/3);
       break;
     case 4: // turn right
       digitalWrite(RIGHT_MOTOR_PIN1, LOW);
-      analogWrite(RIGHT_MOTOR_PIN2, RIGHT_MOTOR_SPEED);
-      analogWrite(LEFT_MOTOR_PIN1, LEFT_MOTOR_SPEED);
+      analogWrite(RIGHT_MOTOR_PIN2, RIGHT_MOTOR_SPEED/3);
+      analogWrite(LEFT_MOTOR_PIN1, LEFT_MOTOR_SPEED/3);
       digitalWrite(LEFT_MOTOR_PIN2, LOW);
       break;
     case 5:
@@ -204,6 +221,7 @@ void car_control() {
       car_mode = 0;
       break;
   }
+  handle_DHT11();
 }
 
 // output HTML web page for user
@@ -235,6 +253,12 @@ String SendHTML() {
   html += "<br><br>\n";
   html += "<input type=\"button\" value=\"Arm down\" onclick=\"window.location.href='/down'\">";
   html += "</form>\n";
+  html += "<p>Temperature: ";
+  html += (int)Temperature;
+  html += " degrees</p>";
+  html += "<p>Humidity: ";
+  html += (int)Humidity;
+  html += "%</p>";
   html += "</div>\n";
   html += "</body>\n";
   html += "</html>\n";
