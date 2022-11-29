@@ -23,7 +23,19 @@ def gen_frames():
 def complementary_color():
     while True:
         success, image = camera.read()
-        image = 255-image
+	## mask of green (36,0,0) ~ (70, 255,255)
+        hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+        # four colors masks
+        mask_red = cv2.inRange(hsv, (0, 50,70), (9,255, 255))
+        mask_green = cv2.inRange(hsv, (36, 50,70), (89, 255, 255))
+        mask_yellow = cv2.inRange(hsv,(25,50, 70),(35,255,255))
+        mask_blue = cv2.inRange(hsv, (110,50,50), (130,255,255))
+        # or gate
+        mask = cv2.bitwise_or(mask_green,mask_yellow)
+        mask = cv2.bitwise_or(mask,mask_red)
+        mask = cv2.bitwise_or(mask,mask_blue)
+        output =cv2.bitwise_and(image,image, mask = mask )  # 套用影像遮罩
+        image = 255-output
         # in_data = np.asarray(image)
         # lo = np.amin(in_data, axis=2, keepdims=True)
         # hi = np.amin(in_data, axis=2, keepdims=True)
