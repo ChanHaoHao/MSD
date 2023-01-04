@@ -1,6 +1,7 @@
+#include <ESP8266WiFi.h>
 #include <SimpleDHT.h> 
- 
-int pinDHT11 = 7;
+
+#define pinDHT11 0
 SimpleDHT11 dht11;
  
 void setup() {
